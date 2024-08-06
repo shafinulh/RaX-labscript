@@ -2,6 +2,7 @@
 app_saved_configs/
 blacs/
 labscript-devices/
+labconfig/
 labscript-utils/
 logs/
 network_testing/
