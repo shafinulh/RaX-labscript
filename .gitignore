@@ -1,3 +1,16 @@
+# Folders to ignore
+app_saved_configs/
+blacs/
+labscript-devices/
+labscript-utils/
+logs/
+network_testing/
+conda_list_output.txt
+
+# IDE specific folder
+.vscode/
+.idea/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
