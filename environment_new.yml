@@ -1,0 +1,12 @@
+name: labscript_pip
+channels:
+  - defaults
+  - conda-forge
+  - labscript-suite
+dependencies:
+  - python==3.11.9
+  - matplotlib
+  - numpy
+  - pyzmq=23.2.0
+  - pyqt
+  - pip
