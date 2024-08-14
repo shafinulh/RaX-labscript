@@ -8,7 +8,7 @@ The RaX team is actively working on improvements and new features for labscript.
 This README provides a brief overview of our key features and improvements. Each section includes links to more detailed information and source code for those interested in further exploration or implementation.
 
 ## BLACS
-The main improvement we looked at was to optimize the performance of BLACS by reducing the overhead between experimental shots, particularly when we want to process a large sequence. While the labscript suite is very well-developed, user-friendly, and supports all general workflows, optimizing this specific workflow can significantly improve efficiency during high-throughput experimental sequence runs.
+The main improvement was to optimize the performance of BLACS by reducing overhead between experimental shots, particularly when we want to process a large sequence. While the labscript suite is very well-developed, user-friendly, and supports all general workflows, optimizing this specific workflow can significantly improve efficiency during high-throughput experimental sequence runs.
 
 The key areas of BLACS identified for potential improvements are:
 
