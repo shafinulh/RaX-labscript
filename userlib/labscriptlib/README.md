@@ -1,6 +1,6 @@
 # Main Experiment Control
 
-This folder contains the necessary scripts and configurations for controlling quantum science experiments.
+This folder contains the necessary scripts and configurations for writing experiment sequences.
 
 ## Folder Structure
 
