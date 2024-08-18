@@ -6,6 +6,8 @@ labconfig/
 labscript-utils/
 logs/
 network_testing/
+userlib/user_devices/NuvuCamera
+userlib/labscriptlib/main_experiment_control_old/
 conda_list_output.txt
 
 # IDE specific folder
