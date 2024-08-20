@@ -8,16 +8,16 @@ into the experiment sequence scripts you write, but this is NOT recommended. Ple
 sequence files to understand why.
 
 Example Devices:
-1. PrawnBlaster: Used as a PseudoClock for timing control.
-2. NI_PXIe_6361: Multi-Function I/O device.
-3. NI_PXIe_6535: Digital Output device.
-4. NI_PXIe_6739: Analog Output device.
-5. NuvuCamera: For image acquisition.
-6. RemoteControl: For communication with LabVIEW laser locking system.
+1. PrawnBlaster: Used as a PseudoClock for timing control
+2. NI_PXIe_6361: Multi-Function I/O device
+3. NI_PXIe_6535: Digital Output device
+4. NI_PXIe_6739: Analog Output device
+5. NuvuCamera: For image acquisition
+6. RemoteControl: For communication with LabVIEW laser locking system
 
-Each device is configured with physical connections and their settings.
+Each device is configured with physical connections and their settings
 
-For more detailed discussions about writing the connection table, see the Confluence Page. 
+For more detailed discussions about writing the connection table, see the Confluence Page 
 """
 
 ##### Unknown import, can probably delete ##################

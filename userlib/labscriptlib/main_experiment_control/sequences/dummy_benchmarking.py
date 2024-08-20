@@ -55,26 +55,26 @@ def digital_ref():
     return t
 
 # A wrapper for the labscript `acquire` primitive
-def collect_AO(ai_chan: AnalogIn, start_time, end_time):
+def collect_AO(ai_chan: AnalogIn, label, start_time, end_time):
     t=start_time
-    t+=ai0_6361.acquire(label='AO_ramp', start_time=t, end_time=end_time)
+    t+=ai_chan.acquire(label=label, start_time=t, end_time=end_time)
     return t
 
 # start the sequence - we will write it to contain an output ramp and absorption signal
 t = 0
 start()
 
-# write an output ramp, leveraging GLOBALS to define ramp parameters
+# write an output ramp to AO1 using labscript primitive functions, leveraging GLOBALS to define ramp parameters
 t=RAMP_TI
-add_time_marker(t, f"Analog Ramp for {ao_chan.name}", verbose=True)
-t+=ao_chan.ramp(
+add_time_marker(t, f"Analog Ramp for {ao1_6361.name}", verbose=True)
+t+=ao1_6361.ramp(
     t=t,
     initial=RAMP_VI,
     final=RAMP_VF,
     duration=RAMP_DUR,
     samplerate=RAMP_RATE
 )
-ao_chan.constant(t=t, value=0)
+ao1_6361.constant(t=t, value=0)
 
 # use subsequences to define the next part of the sequence
 # NOTE: the timing of the absorption signal is defined in the SUBSEQUENCES GLOBALS
@@ -87,7 +87,7 @@ digital_ref_end_time = digital_ref()
 t=max(t, digital_ref_end_time)
 
 # collect signals - again leveraging GLOBALS to know when the signal should be acquired
-collect_AO(ai0_6361, RAMP_TI, RAMP_TF)
-collect_AO(ai1_6361, DIP_TI, DIP_TF)
+collect_AO(ai1_6361, "Analog Ramp", RAMP_TI, RAMP_TF)
+collect_AO(ai0_6361, "Absorption Signal", DIP_TI, DIP_TF)
 
 stop(t)

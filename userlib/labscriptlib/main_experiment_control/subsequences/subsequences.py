@@ -11,6 +11,7 @@ def absorption_signal(ao_chan: AnalogOut):
     t=0
     ao_chan.constant(t=t, value=SIGNAL_VI)
     t=DIP_TI
+    add_time_marker(t, f"Absorption Signal for {ao_chan.name}", verbose=True)
     t+=ao_chan.sine4_reverse_ramp(
         t=t,
         initial=DIP_VF,
