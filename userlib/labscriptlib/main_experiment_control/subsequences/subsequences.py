@@ -28,3 +28,10 @@ def absorption_signal(ao_chan: AnalogOut):
         samplerate=DIP_RATE,
     )
     return t
+
+
+def digital_pulse(digital_chan: DigitalOut,tstart,tdur):
+    digital_chan.go_high(tstart)
+    tend = tstart+tdur
+    digital_chan.go_low(tend)
+    return tend

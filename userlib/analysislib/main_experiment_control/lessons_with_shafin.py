@@ -1,4 +1,5 @@
 import lyse
+import numpy as np
 import matplotlib.pyplot as plt
 
 # Is this script being run from within an interactive lyse session?
@@ -14,15 +15,12 @@ run = lyse.Run(h5_path)
 
 # Get a dictionary of the global variables used in this shot
 run_globals = run.get_globals()
-run_globals = run 
+print(run_globals)
 
 # extract the traces
 trace_names = [
-    "measurement_AO_0",
-    "dummy_measurement_AO_0_fast",
-    "measurement_AO_1",
-    "dummy_measurement_slow",
-    "dummy_measurement_med"
+    "Atom Absorption",
+    "Molecule Absorption",
 ]
 trace_data = {}
 
@@ -35,7 +33,7 @@ for trace_name, (time, values) in trace_data.items():
     plt.plot(time, values, label=trace_name)
 
 
-plt.ylim(0, 3.1)
+plt.ylim(0, 1.6)
 
 plt.xlabel('Time')
 plt.ylabel('Values')
@@ -47,5 +45,7 @@ plt.show()
 
 # Compute a result based on the data processing and save it to the 'results' group of
 # the shot file
-ai1_int = trace_data["measurement_AO_1"][1].sum()
-run.save_result('ai1 integrated', ai1_int)
+ai1_int = trace_data["Atom Absorption"][1].mean()
+ai1_int_err = trace_data["Atom Absorption"][1].std()/np.sqrt(len(trace_data["Atom Absorption"][1]))
+run.save_result('atom_abs integrated', ai1_int)
+run.save_result('atom_abs integrated err', ai1_int_err)

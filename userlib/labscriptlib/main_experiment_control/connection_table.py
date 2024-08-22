@@ -44,7 +44,6 @@ from labscript import (
 )
 
 def connection_table():
-    
     # PseudoClock
     pb = PrawnBlaster(
         name='pb',
@@ -106,6 +105,24 @@ def connection_table():
         parent_device=ni_6361_mio,
         connection="port0/line2",
         serial_number=0xDEADBEEF, # NUVU camera initialization does not require serial_number, no need to touch this
+        camera_attributes={
+            "readoutMode":1, #1 = EM
+            "exposure_time":20, #Shafin: "Um miliseconds?"
+            "timeout": 1000, #See above for units
+            "square_bin": 1, #NxN bin size
+            'target_detector_temp':-60, 
+            "emccd_gain": 1, #Max 5000
+            "trigger_mode":1, # 1 = EXT_LOW_HIGH, #0 = INT, 2 "EXT_LOW_HIGH_EXP" (minus for HIGH_LOW)
+        },
+        manual_mode_camera_attributes={
+            "readoutMode":1,
+            "exposure_time":20,
+            "timeout": 1000,
+            "square_bin": 1,
+            'target_detector_temp':-60,
+            "emccd_gain": 1,
+            "trigger_mode":0,
+        },
         mock=False
     )
     # NOTE: The NI-DAQmx driver requires an even number of digital output channels.
