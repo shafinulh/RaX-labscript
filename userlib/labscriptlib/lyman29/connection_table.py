@@ -3,7 +3,7 @@ from labscript_devices.PineBlaster import PineBlaster
 from labscript_devices.NI_DAQmx.labscript_devices import NI_PCIe_6363
 from labscript_devices.DummyIntermediateDevice import DummyIntermediateDevice
 
-from labscript_devices.RemoteControl.labscript_devices import RemoteControl, RemoteAnalogOut, RemoteAnalogMonitor
+from user_devices.RemoteControl.labscript_devices import RemoteControl, RemoteAnalogOut, RemoteAnalogMonitor
 
 # Use a pineblaster for the psuedoclock
 PineBlaster(name='pb', usbport='COM9')
