@@ -1,12 +1,18 @@
 from labscript import start, stop, add_time_marker, AnalogOut, DigitalOut, AnalogIn
 from labscript_devices.PineBlaster import PineBlaster
+
+from labscript_devices.PrawnBlaster.labscript_devices import PrawnBlaster
+
 from labscript_devices.NI_DAQmx.labscript_devices import NI_PCIe_6363
 from labscript_devices.DummyIntermediateDevice import DummyIntermediateDevice
 
-from user_devices.RemoteControl.labscript_devices import RemoteControl, RemoteAnalogOut, RemoteAnalogMonitor
+from labscript_devices.RemoteControl.labscript_devices import RemoteControl, RemoteAnalogOut, RemoteAnalogMonitor
 
-# Use a pineblaster for the psuedoclock
-PineBlaster(name='pb', usbport='COM9')
+# Use a PrawnBlaster for the psuedoclock
+PrawnBlaster(name='prawn', com_port='COM12')
+
+# Can't have multiple master pseudoclocks.
+# Figure out how triggering works between pseudoclocks 
 
 '''
 Initialize the NI Hardware and all the channels
@@ -14,10 +20,9 @@ to be used on each card
 '''
 ni_6363_max_name = "PXI1Slot2"
 
-
 NI_PCIe_6363(
     name='ni_6363', 
-    parent_device=pb_clock_line,
+    parent_device=prawn.clocklines[0],
     clock_terminal=f'/{ni_6363_max_name}/PFI1',
     MAX_name=f'{ni_6363_max_name}',
     acquisition_rate=1000e3,
