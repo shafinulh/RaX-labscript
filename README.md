@@ -91,4 +91,4 @@ The **RemoteControl** device for labscript is designed to provide manual and buf
 </p>
 
 ### Nuvu Camera labscript-device
-
+Implemented Nuvu Camera python drivers, to be documented later.
