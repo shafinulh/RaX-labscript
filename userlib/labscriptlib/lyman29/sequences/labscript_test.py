@@ -44,7 +44,7 @@ if True:
     ni_6363_max_name = "PXI1Slot2"
     ni_6363_clockline = pb.clocklines[0] 
 
-    NI_PCIe_6363(
+    ni_6363 = NI_PCIe_6363(
         name='ni_6363', 
         parent_device=ni_6363_clockline,
         clock_terminal=f'/{ni_6363_max_name}/PFI1',
