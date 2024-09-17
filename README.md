@@ -20,7 +20,7 @@ More details, along with the BLACS fork can be found at https://github.com/shafi
 
 ### Performance Improvements Overview
 
-The following demonstration visualizes the overall impact of the optimizations. Each GIF shows BLACS executing 20 experimental shots queued up from Runmanager, each 23ms long. These experiments utilize a single NI PCIe-6363 Multifunction card, outputting Analog and Digital signals and collecting Analog inputs at maximum sampling rates.
+The following demonstration visualizes the overall impact of the optimizations. Each GIF shows BLACS executing 20 experimental shots queued up from Runmanager, each 25ms long. These experiments utilize 3 National Instrument IO cards outputting Analog and Digital signals and collecting Analog inputs at maximum sampling rates.
 
 <div style="display: flex; justify-content: space-between;">
     <img src="readme_images/blacs_default_2-266hz.gif" alt="Default Labscript Branch Demo" width="32%">
@@ -91,4 +91,4 @@ The **RemoteControl** device for labscript is designed to provide manual and buf
 </p>
 
 ### Nuvu Camera labscript-device
-
+Implemented Nuvu Camera python drivers, to be documented later.
