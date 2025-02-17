@@ -54,8 +54,9 @@ class NuvuCamera(object):
     
     # Prepare acquisition
     def configure_acquisition(self, continuous=False, bufferCount=0):
-        if self.camera_utils.camIsAcquring() == 1:
-            self.camera_utils.cam_stop()
+        self.camera_utils.cam_stop()
+        # if self.camera_utils.camIsAcquring() == 1:
+            # self.camera_utils.cam_stop()
         if continuous:
             assert bufferCount == 0
         self.camera_utils.cam_start(bufferCount)

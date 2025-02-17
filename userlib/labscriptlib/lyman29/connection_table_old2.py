@@ -11,7 +11,7 @@ from user_devices.NuvuCamera.labscript_devices import NuvuCamera
 pb = PrawnBlaster(
         name='pb',
         com_port='COM12',
-        num_pseudoclocks=1
+        # num_pseudoclocks=2
     )
 
 '''
@@ -28,10 +28,6 @@ ni_6363 = NI_PCIe_6363(
     MAX_name=f'{ni_6363_max_name}',
     acquisition_rate=100e3,
     stop_order=-1,
-    AI_term = 'Diff',
-    num_AI = 2,
-    num_AO = 0,
-    num_CI=1,
 )
 
 # Analog Output Channels
@@ -41,16 +37,12 @@ ni_6363 = NI_PCIe_6363(
 
 # Digital Output Channels
 YAG_trig = DigitalOut(
-    name='do1', parent_device=ni_6363, connection='port0/line1'
+    name='do0', parent_device=ni_6363, connection='port0/line0'
 )
 
-# camera_trig = DigitalOut(
-#     name='do2', parent_device=ni_6363, connection='port0/line2'
-# )
-
 # Analog Input Channels
-# mol_abs = AnalogIn(name="ai0", parent_device=ni_6363, connection='ai0')
-# atom_abs = AnalogIn(name="ai1", parent_device=ni_6363, connection='ai1')
+mol_abs = AnalogIn(name="ai0", parent_device=ni_6363, connection='ai0')
+atom_abs = AnalogIn(name="ai1", parent_device=ni_6363, connection='ai1')
 
 # Nuvu Camera
 # NOTE: The initialization of the NuvuCamera creates an implicit DO under the name "camera_trigger" at the specified connection.
@@ -66,8 +58,7 @@ camera = NuvuCamera(
         "square_bin": 1, #NxN bin size
         'target_detector_temp':-60, 
         "emccd_gain": 500, #Max 5000
-        "trigger_mode":2, # 1 = EXT_LOW_HIGH, #0 = INT, 2 "EXT_LOW_HIGH_EXP" (minus for HIGH_LOW),
-        "shutter_mode": 1,
+        "trigger_mode":1, # 1 = EXT_LOW_HIGH, #0 = INT, 2 "EXT_LOW_HIGH_EXP" (minus for HIGH_LOW)
     },
     manual_mode_camera_attributes={
         "readoutMode":1,
@@ -77,7 +68,6 @@ camera = NuvuCamera(
         'target_detector_temp':-60,
         "emccd_gain": 500,
         "trigger_mode":0,
-        "shutter_mode":1,
     },
     mock=False
 )

@@ -30,6 +30,7 @@ class NuvuCamUtils(nc_camera):
         'target_detector_temp':-60,
         "emccd_gain": 2,
         "trigger_mode":0,
+        "shutter_mode":1, # 0= undefined 1 = on, 2= off, 3=auto
     }
 
     def __init__(self, logger):
@@ -44,7 +45,8 @@ class NuvuCamUtils(nc_camera):
             "square_bin": self.set_square_bin,
             "target_detector_temp": self.set_target_detector_temp,
             "emccd_gain": self.set_calibrated_em_gain,
-            "trigger_mode": self.set_trigger_mode
+            "trigger_mode": self.set_trigger_mode,
+            "shutter_mode": self.set_shutter_mode
         }
 
         self.openCam(nbBuff=4)
@@ -113,8 +115,9 @@ class NuvuCamUtils(nc_camera):
         return (1/arg)*1000
     
     # called both to change the fps and calibrate the real_fps being tracked
-    def set_trigger_mode(self, external=False):
-        pass
+    # def set_trigger_mode(self, external=False):
+    #     pass
+    # Commented out by AJ on 02-10-2025 to debug camera triggering
 
     @disconnect_if_error
     def set_fps(self,new_fps):
@@ -155,6 +158,7 @@ class NuvuCamUtils(nc_camera):
     def set_trigger_mode(self, triggerMode):
         self.setTriggerMode(triggerMode)
         self.getTriggerMode()
+        self.logger.debug(f"after setting trigger mode:\n{self.getAllCamInfo()}")
         
     @disconnect_if_error
     def set_exposure_time(self, new_exposure_time):
@@ -162,6 +166,7 @@ class NuvuCamUtils(nc_camera):
         self.setWaitingTime(0) # sets the exposure time to the readout time. in buffered acquisition we shouldnt have excess waiting time
         self.getExposureTime()
         self.getReadoutTime()
+        self.logger.debug(f"after setting exposure time:\n{self.getAllCamInfo()}")
     
     @disconnect_if_error
     def set_timeout(self, timeout):
@@ -180,6 +185,12 @@ class NuvuCamUtils(nc_camera):
     def set_calibrated_em_gain(self, new_em_gain):
         self.setCalibratedEmGain(new_em_gain)
         self.getCalibratedEmGain()
+
+    @disconnect_if_error
+    def set_shutter_mode(self, new_shutter_mode):
+        self.setShutterMode(new_shutter_mode)
+        self.getShutterMode()
+        self.logger.debug(f"after setting shutter mode:\n{self.getAllCamInfo()}")
     
     # Image collection Methods
     @disconnect_if_error

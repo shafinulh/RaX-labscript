@@ -26,7 +26,7 @@ if True:
     from labscript_devices.NI_DAQmx.models.NI_PCIe_6363 import NI_PCIe_6363
     from labscript_devices.DummyIntermediateDevice import DummyIntermediateDevice
 
-    # from user_devices.RemoteControl.labscript_devices import RemoteControl, RemoteAnalogOut, RemoteAnalogMonitor
+    from user_devices.RemoteControl.labscript_devices import RemoteControl, RemoteAnalogOut, RemoteAnalogMonitor
 
     # Use a pineblaster for the psuedoclock
     # PineBlaster(name='pb', usbport='COM9')
@@ -70,6 +70,39 @@ if True:
     ai0_6363 = AnalogIn(name="ai0", parent_device=ni_6363, connection='ai0')
     ai1_6363 = AnalogIn(name="ai1", parent_device=ni_6363, connection='ai1')
 
+    # Remote Operation of Laser Lock GUI
+    RemoteControl(name='LaserLockGUI', host="localhost", reqrep_port=55535, pubsub_port=55536, mock=False) # add IP address and Port of the host software
+
+    RemoteAnalogOut(
+        name='cwave_generator_setpoints', 
+        parent_device=LaserLockGUI, 
+        connection='cwave_gtr_set',
+        units="nm",
+        decimals=6
+    )
+    RemoteAnalogOut(
+        name='Titanium_Sapphire_setponts', 
+        parent_device=LaserLockGUI, 
+        connection='TiSa_set',
+        units="nm",
+        decimals=6
+    )
+    RemoteAnalogMonitor(
+        name='Titanium_Sapphire_actual_values', 
+        parent_device=LaserLockGUI, 
+        connection='TiSa_act',
+        units="nm",
+        decimals=6
+    )
+
+    RemoteAnalogMonitor(
+        name='cwave_generator_actual_values', 
+        parent_device=LaserLockGUI, 
+        connection='cwave_gtr_act',
+        units="nm",
+        decimals=6
+    )
+
 
 from labscriptlib.lyman29.subsequences.subsequences import *
 
@@ -83,4 +116,4 @@ tstart = 0
 tend = 10e-3
 ai0_6363.acquire('Atom Absorption',tstart,tend)
 
-stop(10e-3)
+stop(20e-3)

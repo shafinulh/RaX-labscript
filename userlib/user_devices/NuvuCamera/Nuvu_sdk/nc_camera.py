@@ -63,7 +63,7 @@ class nc_camera:
         self.readoutTime = c_double(-1.0)
         self.waitingTime = c_double(-1.0)
         self.exposureTime = c_double(-1.0)
-        self.shutterMode = c_int(0)
+        self.shutterMode = c_int(0) 
         self.name = "image1"
         self.comment = ""
         self.width = c_int(-1)
