@@ -5,6 +5,7 @@ import h5py
 import labscript_utils.properties
 import zmq
 import json
+import threading
 
 from labscript_utils.ls_zprocess import Context
 from labscript_utils.shared_drive import path_to_local
@@ -52,6 +53,8 @@ class RemoteCommunication:
         self.logger = logger
         self.child_connections = child_connections
         self.connected = False
+        # self.req_lock = threading.Lock()
+
         
         if self.mock:
             self.logger.debug("Starting remote communication using a mock server")
@@ -61,7 +64,7 @@ class RemoteCommunication:
             self.host = host
             self.port = port
     
-    def connect_to_remote(self, timeout=1000):
+    def connect_to_remote(self, timeout=60000): #Arian: 60 sec timeout to give the apparatus time to tune parameters
         self.socket = self.context.socket(zmq.REQ)
         self.socket.connect(f"tcp://{self.host}:{self.port}")
         
@@ -98,6 +101,7 @@ class RemoteCommunication:
             response_json = self.mock_request_handler(json.dumps(message)) 
             return json.loads(response_json)
         else:
+            # with self.req_lock: didn't work
             try:
                 self.socket.send_json(message)
                 return self.socket.recv_json()
@@ -247,12 +251,21 @@ class RemoteControlWorker(Worker):
         pass
 
     def program_manual(self, front_panel_values):
+         # DEBUG: what values did BLACS actually hand us?
+        self.remote_comms.logger.debug(f"program_manual called; connected={self.remote_comms.connected}; "
+                      f"front_panel_values={front_panel_values!r}")
         if not self.remote_comms.connected:
+            self.logger.debug("  → Not connected, skipping PROGRAM_VALUE")
             return {}
 
-        for connection in self.child_output_connections:
-            response = self.remote_comms.program_value(connection, front_panel_values[connection])
+        for connection, value in front_panel_values.items():
+            self.remote_comms.logger.debug(f"  → sending PROGRAM_VALUE for {connection}: {value!r}")
+            response = self.remote_comms.program_value(connection, value)
             self.handle_response(response)
+
+        # for connection in self.child_output_connections:
+            # response = self.remote_comms.program_value(connection, front_panel_values[connection])
+            # self.handle_response(response)
         # No need to return values to coerce front_panel_values since any changes to remote values
         # will be communicated through asynchronous PUB-SUB communication
         return {}

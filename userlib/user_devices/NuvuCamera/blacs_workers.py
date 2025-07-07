@@ -6,6 +6,7 @@ from labscript_utils.properties import set_attributes
 import numpy as np
 import sys
 import h5py
+import json
 
 import threading
 
@@ -62,6 +63,17 @@ class NuvuCamera(object):
         self.camera_utils.cam_start(bufferCount)
         self.logger.debug("configured acquisition")
     
+    def get_cam_data(self): #added by Shungo, 02/25/2025
+        Camera_all_info = self.camera_utils.getAllCamInfo() # This gives a dictionary
+        cam_data = np.zeros(5)
+        cam_data[0] = float(Camera_all_info['componentTemp']['detectorTemp'])
+        cam_data[1] = float(Camera_all_info['rawEmGain'])
+        cam_data[2] = float(Camera_all_info['calibratedEmGain'])
+        cam_data[3] = float(Camera_all_info['exposureTime'])
+        cam_data[4] = int(Camera_all_info['currentReadoutMode'])
+        return cam_data
+
+
     # used for grabbing during buffered
     def grab(self):
         return self.camera_utils.get_queued_image()
@@ -223,6 +235,17 @@ class NuvuCameraWorker(IMAQdxCameraWorker):
                 dset.attrs['IMAGE_VERSION'] = np.string_('1.2')
                 dset.attrs['IMAGE_SUBCLASS'] = np.string_('IMAGE_GRAYSCALE')
                 dset.attrs['IMAGE_WHITE_IS_ZERO'] = np.uint8(0)
+
+            # Save camera settings to hdf5 file - added by Shungo, 02/25/2025
+            cam_data = self.camera.get_cam_data()
+            f.create_dataset('/data/cam_info/detectorTemp', data=cam_data[0])
+            f.create_dataset('/data/cam_info/rawEMGain', data=cam_data[1])
+            f.create_dataset('/data/cam_info/calibratedEmGain', data=cam_data[2])
+            f.create_dataset('/data/cam_info/exposureTime', data=cam_data[3])
+            f.create_dataset('/data/cam_info/currentReadoutMode', data=cam_data[4]) #(0=nothing, 1=EM, 2=CONV).
+
+
+
 
         # If the images are all the same shape, send them to the GUI for display:
         try:

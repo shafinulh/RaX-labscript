@@ -26,6 +26,96 @@ from labscript import(
 )
 import numpy as np
 
+#Under development - Arian
+#TODO: Can we just bypass the remote analog out class?
+class MultiStaticOutputValue:
+    '''
+    A multi-channel version of RemoteAnalogOut
+    '''
+
+    def __init__(self,
+                 num_channels,
+                 parent_device,
+                 name_array=None,
+                 units = 'THz',
+                 limit_array = None,
+                 decimals = 8,
+                 step_size = 1e-6,
+                 **device_kwargs):
+        '''
+        Args:
+            num_channels (int): how many RemoteAnalogOut channels
+            parent_device: passed straight through
+            name_prefix (str): e.g. "remote_out" → labscript names "remote_out[0]", etc.
+            units, limits, decimals, step_size: all passed through to each channel
+            device_kwargs: any other kwargs your RemoteAnalogOut __init__ wants
+        '''
+        self.num_channels=num_channels
+        self.channels = []
+        if name_array is None:
+            name_array = [f'Channel_{i}' for i in range(num_channels)]
+        if limit_array is None:
+            limit_array =[(0,np.inf) for i in range(num_channels)]
+        
+        for i in range(num_channels):
+            # each channel gets its own connection string and name
+            chan = RemoteAnalogOut(
+                name=name_array[i],
+                parent_device=parent_device,
+                connection=i,
+                units=units,
+                limits=limit_array[i],
+                decimals=decimals,
+                step_size=step_size,
+                **device_kwargs
+            )
+            self.channels.append(chan)
+
+    def constant(self, values, units='None'):
+        """
+        values: either a scalar (broadcast) or array-like length num_channels.
+        units: optional, passed to each channel.constant()
+        """
+        arr = np.array(values, dtype=float)
+        if arr.ndim == 0:
+            arr = np.full(self.num_channels, arr.item())
+        if arr.shape[0] != self.num_channels:
+            raise LabscriptError(
+                f"Expected {self.num_channels} values, got {arr.shape[0]}"
+            )
+        for chan, val in zip(self.channels, arr):
+            chan.constant(val, units)
+
+
+
+    def expand_timeseries(self, *args, **kwargs):
+        """
+        Calls each sub‐channel’s expand_timeseries, then flattens
+        their raw_output (each a 1‑element array) into one vector.
+        """
+        raws = []
+        for chan in self.channels:
+            chan.expand_timeseries(*args, **kwargs)
+            raws.append(np.atleast_1d(chan.raw_output))
+        self.raw_output = np.concatenate(raws)
+
+    @property
+    def static_value(self):
+        """Return a numpy array of each channel’s static_value."""
+        vals = [chan.static_value for chan in self.channels]
+        return np.array(vals, dtype=float)
+
+    def value_set(self):
+        """Return a boolean array telling you which channels have been set."""
+        flags = [chan.value_set() for chan in self.channels]
+        return np.array(flags, dtype=bool)
+
+    
+    
+
+
+
+
 class RemoteAnalogOut(StaticAnalogQuantity): # More appropriately named RemoteOutputValue
     description = "Remote Analog Output Value"
     
@@ -191,9 +281,9 @@ class RemoteControl(Device):
         if len(analogs.keys()) == 0:
             return
         connections = sorted(analogs)
-        dtypes = [(connection, np.float32) for connection in connections]
+        dtypes = [(str(connection), np.float32) for connection in connections]
         static_value_table = np.empty(1, dtype=dtypes)
         for connection, analog in analogs.items():
-            static_value_table[connection][0] = analog.static_value
+            static_value_table[str(connection)][0] = analog.static_value
         grp = self.init_device_group(hdf5_file)
         grp.create_dataset('remote_device_operation', data=static_value_table)

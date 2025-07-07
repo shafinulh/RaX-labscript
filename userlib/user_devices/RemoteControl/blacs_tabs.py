@@ -9,6 +9,7 @@ from blacs.device_base_class import (
     MODE_MANUAL,
     MODE_TRANSITION_TO_BUFFERED,
     MODE_TRANSITION_TO_MANUAL,
+    inmain,
 )
 
 import threading
@@ -109,42 +110,152 @@ class RemoteControlTab(DeviceTab):
             else:
                 # throw an error
                 pass
-
-        # Remote Output Value Widgets
+        
+         # --- CORRECTED WIDGET INITIALIZATION ---
+        
+        # 1. Gather properties for both setpoint and monitor channels
         AO_prop = {}
         for analog_out_device in self.child_output_devices:
-            child_properties = analog_out_device._properties
-            min_val, max_val = child_properties["limits"]
-            AO_prop[analog_out_device.parent_port] = {
-                'base_unit': child_properties["units"],
-                'min': min_val,
-                'max': max_val,
-                'step': child_properties["step_size"],
-                'decimals': child_properties["decimals"],
+            props = analog_out_device._properties
+            AO_prop[props['connection']] = {
+                'base_unit': props["units"], 'min': props["limits"][0], 'max': props["limits"][1],
+                'step': props["step_size"], 'decimals': props["decimals"],
             }
-        self.create_analog_outputs(AO_prop)
-        _, self.AO_widgets, _ = self.auto_create_widgets()
-        self.ao_toolpalette_widget = self.auto_place_widgets(("Analog Outputs", self.AO_widgets))
 
-        # Remote Monitor Value Widgets
         AM_prop = {}
         for analog_monitor_device in self.child_monitor_devices:
-            child_properties = analog_monitor_device._properties
-            min_val, max_val = child_properties["limits"]
-            AM_prop[analog_monitor_device.parent_port] = {
-                'base_unit': child_properties["units"],
-                'min': min_val,
-                'max': max_val,
-                'step': child_properties["step_size"],
-                'decimals': child_properties["decimals"],
+            props = analog_monitor_device._properties
+            AM_prop[props['connection']] = {
+                'base_unit': props["units"], 'min': props["limits"][0], 'max': props["limits"][1],
+                'step': props["step_size"], 'decimals': props["decimals"],
             }
-        self.create_analog_outputs(AM_prop)
+        
+        # 2. Unify all properties and create a SINGLE backend for each channel
+        all_props = {}
+        all_props.update(AO_prop)
+        all_props.update(AM_prop) # Overwrites with identical values, which is fine
+        self.create_analog_outputs(all_props)
+
+        # 3. Create two separate sets of widgets from the single set of backends
+        # Create interactive widgets for setting values (Analog Outputs)
+        _, self.AO_widgets, _ = self.create_subset_widgets(AO_prop)
+        self.ao_toolpalette_widget = self.auto_place_widgets(("Analog Outputs", self.AO_widgets))
+
+        # Create read-only widgets for monitoring values (Analog Monitors)
         _, self.AM_widgets, _ = self.create_subset_widgets(AM_prop)
         self.am_toolpalette_widget = self.auto_place_widgets(("Analog Monitors", self.AM_widgets))
-        
-        for _, widget in self.AM_widgets.items():
+
+        # 4. Disable the monitor widgets to make them read-only
+        for widget in self.AM_widgets.values():
             widget.setEnabled(False)
 
+        # --- END OF CORRECTION ---
+
+        #######################
+        # # Remote Output Value Widgets
+        # AO_prop = {}
+        # for analog_out_device in self.child_output_devices:
+        #     child_properties = analog_out_device._properties
+        #     min_val, max_val = child_properties["limits"]
+        #     AO_prop[analog_out_device.parent_port] = {
+        #         'base_unit': child_properties["units"],
+        #         'min': min_val,
+        #         'max': max_val,
+        #         'step': child_properties["step_size"],
+        #         'decimals': child_properties["decimals"],
+        #     }
+        # self.create_analog_outputs(AO_prop)
+        # _, self.AO_widgets, _ = self.auto_create_widgets()
+        # self.ao_toolpalette_widget = self.auto_place_widgets(("Analog Outputs", self.AO_widgets))
+
+        # # Remote Monitor Value Widgets
+        # AM_prop = {}
+        # for analog_monitor_device in self.child_monitor_devices:
+        #     child_properties = analog_monitor_device._properties
+        #     min_val, max_val = child_properties["limits"]
+        #     AM_prop[analog_monitor_device.parent_port] = {
+        #         'base_unit': child_properties["units"],
+        #         'min': min_val,
+        #         'max': max_val,
+        #         'step': child_properties["step_size"],
+        #         'decimals': child_properties["decimals"],
+        #     }
+        # self.create_analog_outputs(AM_prop)
+        # _, self.AM_widgets, _ = self.create_subset_widgets(AM_prop)
+        # self.am_toolpalette_widget = self.auto_place_widgets(("Analog Monitors", self.AM_widgets))
+        
+        # for _, widget in self.AM_widgets.items():
+        #     widget.setEnabled(False)
+
+        ##################
+
+        # # 1) REGISTER only the actuator backends (set-points):
+        # self.create_analog_outputs(AO_prop)
+        # self.AO_widgets = self.create_analog_widgets(AO_prop)
+        # self.ao_toolpalette_widget = self.auto_place_widgets(
+        #     ("Analog Outputs", self.AO_widgets)
+        # )
+
+        # # 2) MANUALLY build a second backend per channel for the monitors:
+        # self._monitor_backends = {}
+        # self.AM_widgets = {}
+        # for channel, props in AM_prop.items():
+        #     # Use BLACS’s internal factory to make a distinct AnalogOutput
+        #     mon = self._create_AO_object(
+        #         self.device_name,
+        #         f"{channel}_monitor",  # must be unique within BLACS
+        #         channel,               # port name
+        #         props
+        #     )
+        #     self._monitor_backends[channel] = mon
+
+        #     # Create the read-only widget and disable it
+        #     w = mon.create_widget(None, False, None)
+        #     w.setEnabled(False)
+        #     self.AM_widgets[channel] = w
+
+        # # 3) Place the monitor widgets in their own tool-palette
+        # self.am_toolpalette_widget = self.auto_place_widgets(
+        #     ("Analog Monitors", self.AM_widgets)
+        # )
+
+        #############################################################################
+
+        # all_props = {}
+        # all_props.update(AO_prop)
+        # all_props.update(AM_prop)
+        # self.create_analog_outputs(all_props)
+        
+        # self.AO_widgets = self.create_analog_widgets(AO_prop)
+        # self.ao_toolpalette_widget = self.auto_place_widgets(
+        #     ("Analog Outputs", self.AO_widgets)
+        # )
+
+        # self.AM_widgets = self.create_analog_widgets(AM_prop)
+        # self.am_toolpalette_widget = self.auto_place_widgets(
+        #     ("Analog Monitors", self.AM_widgets)
+        # )
+        # for w in self.AM_widgets.values():
+        #     w.setEnabled(False)
+
+        # all_props = {}
+        # all_props.update(AO_prop)
+        # all_props.update(AM_prop)
+        # self.create_analog_outputs(all_props)
+        
+        # self.AO_widgets = self.create_analog_widgets(AO_prop)
+        # self.ao_toolpalette_widget = self.auto_place_widgets(
+        #     ("Analog Outputs", self.AO_widgets)
+        # )
+
+        # # Build only the MONITOR displays without re‐registering
+        # _, self.AM_widgets, _ = self.create_subset_widgets(AM_prop)
+        # self.am_toolpalette_widget = self.auto_place_widgets(
+        #     ("Analog Monitors", self.AM_widgets)
+        # )
+        # for w in self.AM_widgets.values():
+        #     w.setEnabled(False)
+        
         # Connectivity buttons
         self.reconnect_reqrep_button = QtWidgets.QPushButton("Click Here to Reconnect\nREQ-REP socket")
         self.reconnect_reqrep_button.setStyleSheet("background-color: #ffcccc;")
@@ -337,7 +448,8 @@ class RemoteControlTab(DeviceTab):
                     for subscriber in socks:
                         message = subscriber.recv_string()
                         connection, value = message.split(" ", 1)
-                        self.update_gui_with_message(connection, value)
+                        self.update_gui_with_message(connection, value)   
+                        # inmain(self.update_gui_with_message, connection, value)
 
                 except zmq.ZMQError as e:
                     self.logger.error(f"ZMQ error in subscriber loop: {e}")
@@ -348,6 +460,12 @@ class RemoteControlTab(DeviceTab):
             self.update_gui_status()
             context.term()
     
+    # def update_gui_with_message(self, connection, value):
+    #     if connection in self._monitor_backends:
+    #         mon = self._monitor_backends[connection]
+    #         # Update the monitor backend *and* its widget:
+    #         mon.set_value(float(value), program=False, update_gui=True)
+
     def update_gui_with_message(self, connection, value):
         if connection in self.AM_widgets:
                 self._AO[connection].set_value(float(value), program=False)
