@@ -25,7 +25,7 @@ class NuvuCamUtils(nc_camera):
     default_acquisition_attributes = {
         "readoutMode":1,
         "exposure_time":20,
-        "timeout": 1000,
+        "timeout": 2000,
         "square_bin": 1,
         'target_detector_temp':-60,
         "emccd_gain": 2,

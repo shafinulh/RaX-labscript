@@ -8,6 +8,7 @@ logs/
 network_testing/
 userlib/labscriptlib/main_experiment_control_old/
 conda_list_output.txt
+userlib/analysislib/lyman29/old_gitignore
 
 # IDE specific folder
 .vscode/

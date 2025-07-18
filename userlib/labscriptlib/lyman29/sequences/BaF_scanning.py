@@ -100,6 +100,7 @@ if True:
     # Analog Input Channels
     mol_abs = AnalogIn(name="ai0", parent_device=ni_6363, connection='ai0')
     atom_abs = AnalogIn(name="ai1", parent_device=ni_6363, connection='ai1')
+    DC_abs = AnalogIn(name="ai2", parent_device=ni_6363, connection='ai2')
 
     # Nuvu Camera
     # NOTE: The initialization of the NuvuCamera creates an implicit DO under the name "camera_trigger" at the specified connection.
@@ -145,6 +146,8 @@ Vexlum_Setpoint.constant(freq_ramp)
 # tstart = 0
 # tend = 12e-3
 mol_abs.acquire('Absorption',tstart,tend)
+atom_abs.acquire('Absorption2',tstart,tend) #added 07/14/2025
+DC_abs.acquire('Absorption3',tstart,tend) #added 07/17/2025
 
 # Pulse the YAG
 # tYAG = 2e-3

@@ -113,6 +113,7 @@ start()
 # tstart = 0
 # tend = 12e-3
 mol_abs.acquire('Absorption',tstart,tend) 
+atom_abs.acquire('Absorption2',tstart,tend) #added 07/14/2025
 
 # Pulse the YAG
 # tYAG = 2e-3

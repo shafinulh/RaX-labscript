@@ -106,6 +106,7 @@ camera_trig = DigitalOut(
 # Analog Input Channels
 mol_abs = AnalogIn(name="ai0", parent_device=ni_6363, connection='ai0')
 atom_abs = AnalogIn(name="ai1", parent_device=ni_6363, connection='ai1')
+DC_abs = AnalogIn(name="ai2", parent_device=ni_6363, connection='ai2')
 
 
 
@@ -119,7 +120,7 @@ camera = NuvuCamera(
    camera_attributes={
        "readoutMode":1, #1 = EM
        "exposure_time":20, #Shafin: "Um miliseconds?"
-       "timeout": 1000, #See above for units
+       "timeout": 5000, #See above for units
        "square_bin": 1, #NxN bin size
        'target_detector_temp':-60, 
        "emccd_gain": 5000, #Max 5000
@@ -129,7 +130,7 @@ camera = NuvuCamera(
    manual_mode_camera_attributes={
        "readoutMode":1,
        "exposure_time":20,
-       "timeout": 1000,
+       "timeout": 5000,
        "square_bin": 1,
        'target_detector_temp':-60,
        "emccd_gain": 5000,

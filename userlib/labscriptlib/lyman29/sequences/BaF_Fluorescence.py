@@ -64,6 +64,7 @@ if True:
     # Analog Input Channels
     mol_abs = AnalogIn(name="ai0", parent_device=ni_6363, connection='ai0')
     atom_abs = AnalogIn(name="ai1", parent_device=ni_6363, connection='ai1')
+    DC_abs = AnalogIn(name="ai2", parent_device=ni_6363, connection='ai2')
 
     # Nuvu Camera
     # NOTE: The initialization of the NuvuCamera creates an implicit DO under the name "camera_trigger" at the specified connection.
@@ -75,7 +76,7 @@ if True:
         camera_attributes={
             "readoutMode":1, #1 = EM
             "exposure_time":20, #Shafin: "Um miliseconds?"
-            "timeout": 1000, #See above for units
+            "timeout": 5000, #See above for units
             "square_bin": 1, #NxN bin size
             'target_detector_temp':-60, 
             "emccd_gain": 5000, #Max 5000
@@ -85,7 +86,7 @@ if True:
         manual_mode_camera_attributes={
             "readoutMode":1,
             "exposure_time":20,
-            "timeout": 1000,
+            "timeout": 5000,
             "square_bin": 1,
             'target_detector_temp':-60,
             "emccd_gain": 5000,
@@ -106,9 +107,12 @@ start()
 # tbackground = 0
 # camera.expose(tbackground,'fluorescence','background')
 
+#These variables are controlled in run manager
 # tstart = 0
-# tend = 12e-3
+# tend = 25e-3
 mol_abs.acquire('Absorption',tstart,tend) 
+atom_abs.acquire('Absorption2',tstart,tend) #added 07/14/2025
+DC_abs.acquire('Absorption3',tstart,tend) #added 07/17/2025
 
 # Pulse the YAG
 # tYAG = 2e-3
@@ -119,4 +123,4 @@ digital_pulse(YAG_trig,tYAG, 0.5e-3)
 camera.expose(tEMCCD,'fluorescence',trigger_duration=20e-3) 
 
 
-stop(50e-3)
+stop(100e-3)
